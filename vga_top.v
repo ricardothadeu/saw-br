@@ -1,5 +1,5 @@
 module vga_top (
-    input wire clk_50mhz,       // Clock de 50MHz da placa
+    input wire clk_50mhz,
     output wire hsync,
     output wire vsync,
     output wire [3:0] red,
@@ -7,14 +7,13 @@ module vga_top (
     output wire [3:0] blue
 );
 
-    // ===== Clock Divider: 50 MHz → 25 MHz =====
+    // Clock divider: 50 MHz → 25 MHz
     reg clk_25mhz = 0;
     always @(posedge clk_50mhz) begin
         clk_25mhz <= ~clk_25mhz;
     end
 
-  
-    // Parâmetros VGA 640x480 @60Hz
+    // VGA 640x480 @60Hz timing parameters
     localparam H_VISIBLE = 640;
     localparam H_FRONT   = 16;
     localparam H_SYNC    = 96;
@@ -45,34 +44,50 @@ module vga_top (
 
     wire visible_area = (h_count < H_VISIBLE) && (v_count < V_VISIBLE);
 
-    // Retângulo central (por ex., 200x50 px centralizado)
+    // Central rectangle (for visual block)
     wire in_rect = (h_count >= 220 && h_count < 420 && v_count >= 200 && v_count < 250);
 
-    // Posição do texto "PROGRAM COUNTER" — começando em (240, 210)
-    wire [7:0] text[0:14] = {
+    // ========== Linha 1: "PROGRAM COUNTER" ==========
+    wire [7:0] text1[0:14] = {
         "P","R","O","G","R","A","M"," ",
         "C","O","U","N","T","E","R"
     };
+    wire [3:0] char_idx1 = (h_count - 240) >> 3;
+    wire [2:0] row_idx1  = (v_count - 210) % 8;
+    wire [2:0] bit_idx1  = 7 - ((h_count - 240) % 8);
+    wire [7:0] char_code1 = text1[char_idx1];
 
-    wire [3:0] char_idx = (h_count - 240) >> 3;
-    wire [2:0] row_idx  = (v_count - 210) % 8;
-    wire [2:0] bit_idx  = 7 - ((h_count - 240) % 8);
-
-    wire [7:0] char_code = text[char_idx];
-
-    wire [7:0] font_pixels;
-    font_rom font_inst (
-        .char_code(char_code),
-        .row(row_idx),
-        .pixels(font_pixels)
+    wire [7:0] font_pixels1;
+    font_rom font1 (
+        .char_code(char_code1),
+        .row(row_idx1),
+        .pixels(font_pixels1)
     );
 
-    wire text_pixel = (v_count >= 210 && v_count < 218 && h_count >= 240 && h_count < (240 + 8*15)) ?
-                      font_pixels[bit_idx] : 1'b0;
+    wire text_pixel1 = (v_count >= 210 && v_count < 218 && h_count >= 240 && h_count < (240 + 8*15)) ?
+                       font_pixels1[bit_idx1] : 1'b0;
 
-    // Cor
-    assign red   = visible_area && (in_rect || text_pixel) ? 4'hF : 4'h0;
-    assign green = visible_area && (in_rect || text_pixel) ? 4'hF : 4'h0;
-    assign blue  = visible_area && (in_rect || text_pixel) ? 4'hF : 4'h0;
+    // ========== Linha 2: "1010" ==========
+    wire [7:0] text2[0:3] = { "1", "0", "1", "0" };
+    wire [2:0] row_idx2  = (v_count - 233) % 8;
+    wire [3:0] char_idx2 = (h_count - 240) >> 3;
+    wire [2:0] bit_idx2  = 7 - ((h_count - 240) % 8);
+    wire [7:0] char_code2 = text2[char_idx2];
+
+    wire [7:0] font_pixels2;
+    font_rom font2 (
+        .char_code(char_code2),
+        .row(row_idx2),
+        .pixels(font_pixels2)
+    );
+
+    wire text_pixel2 = (v_count >= 233 && v_count < 241 && h_count >= 240 && h_count < (240 + 8*4)) ?
+                       font_pixels2[bit_idx2] : 1'b0;
+
+    // ===== Cor final =====
+    wire pixel_on = visible_area && (in_rect || text_pixel1 || text_pixel2);
+    assign red   = pixel_on ? 4'hF : 4'h0;
+    assign green = pixel_on ? 4'hF : 4'h0;
+    assign blue  = pixel_on ? 4'hF : 4'h0;
 
 endmodule
