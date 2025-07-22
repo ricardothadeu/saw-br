@@ -10,13 +10,15 @@ module program_counter (
 
 	reg [3:0] data = 4'b0000;
 	
-	always @(posedge clock, posedge clear) begin
-		if(clear) data <= 4'b0000;
-		else begin
-			if(pc_inc) data <= data + 4'b0001;
-			else if(jmp) data <= bus_in;
-		end
+	always @(posedge clock) begin
+    		if (clear)
+        		data <= 4'b0000;
+    		else if (pc_inc)
+        		data <= data + 4'b0001;
+    		else if (jmp)
+        		data <= bus_in;
 	end
+
 	
 	assign bus_out = pc_out ? data : 4'bzzzz;
 	
