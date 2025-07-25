@@ -4,7 +4,7 @@ module sap (
 	input [3:0] switch_enderecos, //chaves do fpga.
 	input [7:0] switch_dados, //chaves da placa
 	input clock_fpga, //MAX10_CLK1_50 (PIN_P11)
-	input botao_clear, //Push button no fpga
+	input clear,
 	input prog_run, //chave do fpga
 	output [7:0] saida //leds
 	//output o_clock_sap, o_sig_hlt, o_pc_inc, o_pc_out, o_mar_in, o_ram_out, o_ir_in, o_acc_in, o_acc_out, //PARA VISUALIZACAO
@@ -23,7 +23,6 @@ module sap (
 	wire [7:0] b_to_alu;
 	
 	wire clock;
-	wire clear = ~botao_clear; //os botoes do fpga sao nivel alto quando SOLTOS. Quero 1 quando eu pressiona-lo
 	
 //	assign o_clock_sap = clock;
 //	assign o_sig_hlt = sig_hlt;
@@ -113,6 +112,7 @@ module sap (
 	
 	instruction_reg instruction_reg (
 		.bus_in (bus),
+		.clear (clear),
 		.clock (clock),
 		.ir_in (sig_ir_in),
 		.ir_out (sig_ir_out),

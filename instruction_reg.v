@@ -1,5 +1,6 @@
 module instruction_reg (
 	input [7:0] bus_in,
+	input clear,
 	input clock,
 	input ir_in,
 	input ir_out,
@@ -9,8 +10,9 @@ module instruction_reg (
 
 	reg [7:0] data = 8'b00000000;
 	
-	always @(posedge clock) begin
-		if(ir_in) data <= bus_in;
+	always @(posedge clock or negedge clear) begin
+		if(!clear) data <= 8'b00000000;
+		else if(ir_in) data <= bus_in;
 	end
 	
 	assign bus_out = ir_out ? data[3:0] : 4'bzzzz;

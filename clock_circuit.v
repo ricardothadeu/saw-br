@@ -19,4 +19,4 @@ module clock_circuit (
         (hlt_sig)              ? 1'b0 :    // se halt, sem clock
         (selecao_manual_auto)  ? clock_fpga: // modo auto
                                  key0_fall; // manual: pulso ao apertar
-endmodule
+endmodule 

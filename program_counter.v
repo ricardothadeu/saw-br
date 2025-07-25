@@ -10,8 +10,8 @@ module program_counter (
 
 	reg [3:0] data = 4'b0000;
 	
-	always @(posedge clock) begin
-    		if (clear)
+	always @(posedge clock or negedge clear) begin
+    		if (!clear)
         		data <= 4'b0000;
     		else if (pc_inc)
         		data <= data + 4'b0001;
