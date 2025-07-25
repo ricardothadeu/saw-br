@@ -6,7 +6,7 @@ module output_reg (
 	output [7:0] saida_sap
 );
 	
-	reg [7:0] data = 8'b0;
+	reg [7:0] data = 8'b00000000;
 	
 	always @(posedge clock) begin //isso aqui talvez de errado. tenho que ver esses posedge
 		if(clear) data <= 8'b00000000;
