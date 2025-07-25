@@ -1,5 +1,6 @@
 module ram (
     input clock,          // pulso de 1 ciclo (mesmo usado no SAP)
+	 input we,					//botao de clear servindo como botao de escrita no modo PROG
     input ram_in,             // sinal de controle da UC (modo RUN)
     input ram_out,            // controle de leitura
     input prog_run,           // 0 = modo PROG, 1 = modo RUN
@@ -15,8 +16,10 @@ module ram (
 //		$readmemb("ram.mem", memory);
 //	 end
 
+	//always @(posedge clock or negedge we) begin
     always @(posedge clock) begin
-        if (!prog_run) //MODO PROG
+        //if (!prog_run && !we) //MODO PROG
+		  if (!prog_run) //MODO PROG
             memory[mar_to_ram] <= switch_dados;
         else if (prog_run && ram_in) //Modo RUN e sinal de controle RAM_IN
             memory[mar_to_ram] <= bus_in;

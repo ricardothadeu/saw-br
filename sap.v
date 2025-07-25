@@ -66,6 +66,7 @@ module sap (
 	
 	ram ram (
 		.clock (clock),
+		//.we (clear),
 		.ram_in (sig_ram_in),
 		.ram_out (sig_ram_out),
 		.prog_run (prog_run),
